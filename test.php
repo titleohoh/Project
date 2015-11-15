@@ -14,23 +14,34 @@
 	if(isset($_POST["submit"])){
 		$username = trim($_POST["username"]);
 		$password = trim($_POST["password"]);
-		$id = $_SESSION['ID'];
+	
+		if($username == "") {                    //ถ้ายังไม่ได้กรอกข้อมูลที่ชื่อผู้ใช้ให้ทำงานดังต่อไปนี้
+			echo "คุณยังไม่ได้กรอกชื่อผู้ใช้";
+		} else if($password == "") {        //ถ้ายังไม่ได้กรอกรหัสผ่านให้ทำงานดังต่อไปนี้
+			echo "คุณยังไม่ได้กรอกรหัสผ่าน";
+		} else{	                             //ถ้ากรอกแล้วเข้าอันนี้
 		$query = "SELECT * FROM LIBRARY_LOGIN WHERE username='$username' and password='$password'";
 		$parseRequest = oci_parse($conn, $query);
-		oci_execute($parseRequest);
-		// Fetch each row in an associative array
+		oci_execute($parseRequest);   // Fetch each row in an associative array
 		$row = oci_fetch_array($parseRequest, OCI_RETURN_NULLS+OCI_ASSOC);
+		$_SESSION['TYPE_ID'] = $row['TYPE_ID'];
 		if($row){
 			$_SESSION['USERNAME'] = $row['USERNAME'];
 			$_SESSION['PASSWORD'] = $row['PASSWORD'];
 			$_SESSION['ID'] = $row['ID'];
-
-			echo '<script>window.location = "user.php";</script>';		
+				if($_SESSION['TYPE_ID'] == 1){
+					echo '<script>window.location = "admin.php";</script>';		
+				} else if($_SESSION['TYPE_ID'] == 2){
+					echo '<script>window.location = "librarian.php";</script>';
+				} else{
+					echo '<script>window.location = "user.php";</script>';
+				}
 		}
 		else{
 			echo "Login fail.";
 		}
-	};
+	}
+	}
 	oci_close($conn);
 	?>
 <!DOCTYPE html>
@@ -52,7 +63,7 @@ section{
   <h1 style="text-align: center;">Sign in</h1>
 </div>
 <section style="text-align: center;">
-	<form action="signin.php"  method="post">
+	<form action="test.php"  method="post">
 		<h3 style="margin-left:-200px;">username</h3><br>
 		<input type="text" name="username" value="" style="width:300px"><br>
 		<h3 style="margin-left:-200px;">password</h3><br>
